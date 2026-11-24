@@ -1,6 +1,6 @@
 # Double Cross Connect
 
-A 3×3 word puzzle PWA. Swap tiles to find the shared connection across every row and column; solved lines lock into place. The About page includes a QR code for sharing the game.
+A 3×3 word puzzle PWA. Swap tiles so every row and column matches a category; any category can appear horizontally or vertically, and solved lines lock into place. The About page includes a QR code for sharing the game.
 
 ## Run locally
 

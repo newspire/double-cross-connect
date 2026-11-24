@@ -17,7 +17,6 @@ export type LineKind = "row" | "column";
 export interface Category {
   id: string;
   label: string;
-  kind: LineKind;
   members: TileId[];
 }
 
@@ -40,24 +39,18 @@ export interface GameState {
   isWon: boolean;
 }
 
-export const ROW_CATEGORIES: Category[] = [
-  { id: "red", label: "red", kind: "row", members: ["hair", "river", "wine"] },
-  { id: "hot", label: "hot", kind: "row", members: ["sun", "lava", "coffee"] },
+export const CATEGORIES: Category[] = [
+  { id: "red", label: "red", members: ["hair", "river", "wine"] },
+  { id: "hot", label: "hot", members: ["sun", "lava", "coffee"] },
   {
     id: "sparkles",
     label: "Things that sparkle",
-    kind: "row",
     members: ["stars", "water", "champagne"]
-  }
+  },
+  { id: "eyes", label: "In your eyes", members: ["hair", "sun", "stars"] },
+  { id: "flows", label: "flows", members: ["river", "lava", "water"] },
+  { id: "drink", label: "drink", members: ["wine", "coffee", "champagne"] }
 ];
-
-export const COLUMN_CATEGORIES: Category[] = [
-  { id: "eyes", label: "In your eyes", kind: "column", members: ["hair", "sun", "stars"] },
-  { id: "flows", label: "flows", kind: "column", members: ["river", "lava", "water"] },
-  { id: "drink", label: "drink", kind: "column", members: ["wine", "coffee", "champagne"] }
-];
-
-export const CATEGORIES = [...ROW_CATEGORIES, ...COLUMN_CATEGORIES];
 
 export const TILES: Record<TileId, PuzzleTile> = {
   hair: { id: "hair", label: "hair" },
@@ -148,16 +141,19 @@ function matchesSolvedCrossings(
   kind: LineKind,
   crossingLines: SolvedLine[]
 ): boolean {
-  const crossingCategories = kind === "row" ? COLUMN_CATEGORIES : ROW_CATEGORIES;
+  const category = CATEGORIES.find((item) => item.id === line.categoryId);
+  if (!category) return false;
+
   return crossingLines.every((crossingLine) => {
-    const category = crossingCategories.find((item) => item.id === crossingLine.categoryId);
-    if (!category) return false;
+    const crossingCategory = CATEGORIES.find((item) => item.id === crossingLine.categoryId);
+    if (!crossingCategory) return false;
 
     const tileIndex =
       kind === "row"
         ? line.index * GRID_SIZE + crossingLine.index
         : crossingLine.index * GRID_SIZE + line.index;
-    return category.members.includes(tiles[tileIndex]);
+    const tile = tiles[tileIndex];
+    return category.members.includes(tile) && crossingCategory.members.includes(tile);
   });
 }
 
@@ -166,12 +162,13 @@ export function submitGuess(state: GameState): GameState {
     return state;
   }
 
+  const solvedLines = [...state.solvedRows, ...state.solvedColumns];
   const candidateRows = Array.from({ length: GRID_SIZE }, (_, index) => {
-    const category = matchingCategory(rowTiles(state.tiles, index), ROW_CATEGORIES, state.solvedRows);
+    const category = matchingCategory(rowTiles(state.tiles, index), CATEGORIES, solvedLines);
     return category ? [{ index, categoryId: category.id }] : [];
   }).flat();
   const candidateColumns = Array.from({ length: GRID_SIZE }, (_, index) => {
-    const category = matchingCategory(columnTiles(state.tiles, index), COLUMN_CATEGORIES, state.solvedColumns);
+    const category = matchingCategory(columnTiles(state.tiles, index), CATEGORIES, solvedLines);
     return category ? [{ index, categoryId: category.id }] : [];
   }).flat();
   const newRows = candidateRows.filter((row) =>

@@ -28,14 +28,11 @@ export default function GamePage() {
   const isLocked = (index: number) => isPositionLocked(game, index);
   const isHighlighted = (index: number) => {
     if (!highlighted) return false;
-    const solvedLine =
-      highlighted.kind === "row"
-        ? game.solvedRows.find((line) => line.categoryId === highlighted.id)
-        : game.solvedColumns.find((line) => line.categoryId === highlighted.id);
-    if (!solvedLine) return false;
-    return highlighted.kind === "row"
-      ? Math.floor(index / GRID_SIZE) === solvedLine.index
-      : index % GRID_SIZE === solvedLine.index;
+    const solvedRow = game.solvedRows.find((line) => line.categoryId === highlighted.id);
+    if (solvedRow) return Math.floor(index / GRID_SIZE) === solvedRow.index;
+
+    const solvedColumn = game.solvedColumns.find((line) => line.categoryId === highlighted.id);
+    return solvedColumn !== undefined && index % GRID_SIZE === solvedColumn.index;
   };
 
   const handleTileClick = (index: number) => {
@@ -89,8 +86,8 @@ export default function GamePage() {
         <p className="eyebrow">TODAY'S LITTLE BRAIN TEASER</p>
         <h1 id="game-title">Double Cross <span>Connect</span></h1>
         <p className="intro-copy">
-          Every word belongs to two connections. Any correct row or column that fits already-solved crossing
-          lines counts. Unsolved lines can still be mixed up.
+          Every word belongs to two connections. Any connection can appear in a row or column. A correct line
+          counts if it fits already-solved crossings; unsolved lines can still be mixed up.
         </p>
       </div>
 
@@ -169,30 +166,35 @@ export default function GamePage() {
             </div>
           ) : (
             <ul className="connection-list">
-              {discovered.map((category) => (
-                <li key={category.id}>
-                  <button
-                    type="button"
-                    onMouseEnter={() => setHighlighted(category)}
-                    onMouseLeave={() => setHighlighted(null)}
-                    onFocus={() => setHighlighted(category)}
-                    onBlur={() => setHighlighted(null)}
-                    aria-label={`${category.kind === "row" ? "Row" : "Column"} connection: ${category.label}: ${category.members
-                      .map((tileId) => TILES[tileId].label)
-                      .join(", ")}`}
-                  >
-                    <span className="connection-check" aria-hidden="true">✓</span>
-                    <span className="connection-copy">
-                      <strong>{category.label}</strong>
-                      <small>{category.kind === "row" ? "ROW" : "COLUMN"}</small>
-                      <span className="connection-members">
-                        {category.members.map((tileId) => TILES[tileId].label).join(" · ")}
+              {discovered.map((category) => {
+                const lineKind = game.solvedRows.some((line) => line.categoryId === category.id)
+                  ? "row"
+                  : "column";
+                return (
+                  <li key={category.id}>
+                    <button
+                      type="button"
+                      onMouseEnter={() => setHighlighted(category)}
+                      onMouseLeave={() => setHighlighted(null)}
+                      onFocus={() => setHighlighted(category)}
+                      onBlur={() => setHighlighted(null)}
+                      aria-label={`${lineKind === "row" ? "Row" : "Column"} connection: ${category.label}: ${category.members
+                        .map((tileId) => TILES[tileId].label)
+                        .join(", ")}`}
+                    >
+                      <span className="connection-check" aria-hidden="true">✓</span>
+                      <span className="connection-copy">
+                        <strong>{category.label}</strong>
+                        <small>{lineKind.toUpperCase()}</small>
+                        <span className="connection-members">
+                          {category.members.map((tileId) => TILES[tileId].label).join(" · ")}
+                        </span>
                       </span>
-                    </span>
-                    <span className="connection-arrow" aria-hidden="true">↗</span>
-                  </button>
-                </li>
-              ))}
+                      <span className="connection-arrow" aria-hidden="true">↗</span>
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
           {discovered.length > 0 && (

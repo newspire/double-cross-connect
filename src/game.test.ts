@@ -100,6 +100,46 @@ describe("Double Cross Connect rules", () => {
     expect(solved.wrongGuesses).toBe(0);
   });
 
+  it("recognizes a row-family category in a column on the first guess", () => {
+    const game = boardState([
+      "wine",
+      "sun",
+      "lava",
+      "river",
+      "stars",
+      "coffee",
+      "hair",
+      "water",
+      "champagne"
+    ]);
+
+    const solved = submitGuess(game);
+
+    expect(solved.solvedColumns).toEqual([{ index: 0, categoryId: "red" }]);
+    expect(solved.solvedRows).toEqual([]);
+    expect(solved.wrongGuesses).toBe(0);
+  });
+
+  it("recognizes a column-family category in a row", () => {
+    const game = boardState([
+      "hair",
+      "sun",
+      "stars",
+      "river",
+      "lava",
+      "coffee",
+      "water",
+      "wine",
+      "champagne"
+    ]);
+
+    const solved = submitGuess(game);
+
+    expect(solved.solvedRows).toEqual([{ index: 0, categoryId: "eyes" }]);
+    expect(solved.solvedColumns).toEqual([]);
+    expect(solved.wrongGuesses).toBe(0);
+  });
+
   it("does not accept a matching row that conflicts with an existing solved column", () => {
     const game = {
       ...boardState([
