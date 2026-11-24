@@ -282,17 +282,39 @@ describe("Double Cross Connect rules", () => {
     expect(solved.wrongGuesses).toBe(0);
   });
 
-  it("ends a blocked game when solved rows lock every remaining tile", () => {
-    const blocked = submitGuess(
-      boardState(["hair", "river", "wine", "sun", "coffee", "lava", "champagne", "stars", "water"])
-    );
+  it("rejects a valid row placement that prevents completing the remaining categories", () => {
+    const game = {
+      ...boardState([
+        "hair",
+        "river",
+        "wine",
+        "stars",
+        "water",
+        "champagne",
+        "lava",
+        "sun",
+        "coffee"
+      ]),
+      solvedRows: [{ index: 0, categoryId: "red" }]
+    };
 
-    expect(blocked.solvedRows).toEqual([
+    const submitted = submitGuess(game);
+
+    expect(submitted.solvedRows).toEqual([
       { index: 0, categoryId: "red" },
-      { index: 1, categoryId: "hot" },
-      { index: 2, categoryId: "sparkles" }
+      { index: 1, categoryId: "sparkles" }
     ]);
-    expect(blocked.isComplete).toBe(true);
-    expect(blocked.isWon).toBe(false);
+    expect(submitted.solvedColumns).toEqual([{ index: 2, categoryId: "drink" }]);
+    expect(submitted.solvedRows).not.toContainEqual({ index: 2, categoryId: "hot" });
+    expect(submitted.wrongGuesses).toBe(0);
+    expect(submitted.isComplete).toBe(false);
+
+    const rearranged = swapTiles(submitted, 6, 7);
+    expect(rearranged.tiles.slice(6)).toEqual(["sun", "lava", "coffee"]);
+
+    const completed = submitGuess(rearranged);
+    expect(completed.isWon).toBe(true);
+    expect(completed.solvedRows).toHaveLength(3);
+    expect(completed.solvedColumns).toHaveLength(3);
   });
 });

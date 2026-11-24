@@ -25,6 +25,11 @@ export interface SolvedLine {
   categoryId: string;
 }
 
+interface LineCandidate {
+  kind: LineKind;
+  line: SolvedLine;
+}
+
 export interface PuzzleTile {
   id: TileId;
   label: string;
@@ -135,26 +140,114 @@ function columnTiles(tiles: TileId[], column: number): TileId[] {
   return Array.from({ length: GRID_SIZE }, (_, row) => tiles[row * GRID_SIZE + column]);
 }
 
-function matchesSolvedCrossings(
+function canCompletePuzzle(
   tiles: TileId[],
-  line: SolvedLine,
-  kind: LineKind,
-  crossingLines: SolvedLine[]
+  solvedRows: SolvedLine[],
+  solvedColumns: SolvedLine[]
 ): boolean {
-  const category = CATEGORIES.find((item) => item.id === line.categoryId);
-  if (!category) return false;
+  const solvedLines = [...solvedRows, ...solvedColumns];
+  if (
+    new Set(solvedRows.map((line) => line.index)).size !== solvedRows.length ||
+    new Set(solvedColumns.map((line) => line.index)).size !== solvedColumns.length ||
+    new Set(solvedLines.map((line) => line.categoryId)).size !== solvedLines.length ||
+    solvedLines.some(
+      (line) =>
+        line.index < 0 ||
+        line.index >= GRID_SIZE ||
+        !CATEGORIES.some((category) => category.id === line.categoryId)
+    )
+  ) {
+    return false;
+  }
 
-  return crossingLines.every((crossingLine) => {
-    const crossingCategory = CATEGORIES.find((item) => item.id === crossingLine.categoryId);
-    if (!crossingCategory) return false;
+  const rows: (Category | undefined)[] = new Array(GRID_SIZE);
+  const columns: (Category | undefined)[] = new Array(GRID_SIZE);
 
-    const tileIndex =
-      kind === "row"
-        ? line.index * GRID_SIZE + crossingLine.index
-        : crossingLine.index * GRID_SIZE + line.index;
-    const tile = tiles[tileIndex];
-    return category.members.includes(tile) && crossingCategory.members.includes(tile);
-  });
+  const assignmentsWork = (): boolean => {
+    const expectedTiles = new Set<TileId>();
+
+    for (let row = 0; row < GRID_SIZE; row += 1) {
+      const rowCategory = rows[row];
+      if (!rowCategory) return false;
+
+      for (let column = 0; column < GRID_SIZE; column += 1) {
+        const columnCategory = columns[column];
+        if (!columnCategory) return false;
+
+        const sharedTiles = rowCategory.members.filter((tile) => columnCategory.members.includes(tile));
+        if (sharedTiles.length !== 1) return false;
+
+        const tileIndex = row * GRID_SIZE + column;
+        const tile = sharedTiles[0];
+        if (expectedTiles.has(tile)) return false;
+        expectedTiles.add(tile);
+
+        const isLocked =
+          solvedRows.some((line) => line.index === row) ||
+          solvedColumns.some((line) => line.index === column);
+        if (isLocked && tiles[tileIndex] !== tile) return false;
+      }
+    }
+
+    return expectedTiles.size === GRID_SIZE * GRID_SIZE;
+  };
+
+  const assignLine = (lineIndex: number, remaining: Category[]): boolean => {
+    if (lineIndex === GRID_SIZE * 2) return assignmentsWork();
+
+    const kind: LineKind = lineIndex < GRID_SIZE ? "row" : "column";
+    const index = kind === "row" ? lineIndex : lineIndex - GRID_SIZE;
+    const existing = (kind === "row" ? solvedRows : solvedColumns).find((line) => line.index === index);
+    const candidates = existing
+      ? remaining.filter((category) => category.id === existing.categoryId)
+      : remaining;
+
+    for (const category of candidates) {
+      if (kind === "row") rows[index] = category;
+      else columns[index] = category;
+
+      if (assignLine(lineIndex + 1, remaining.filter((item) => item.id !== category.id))) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  return assignLine(0, CATEGORIES);
+}
+
+function selectCompletableCandidates(
+  tiles: TileId[],
+  solvedRows: SolvedLine[],
+  solvedColumns: SolvedLine[],
+  candidates: LineCandidate[]
+): LineCandidate[] {
+  for (let count = candidates.length; count > 0; count -= 1) {
+    const search = (start: number, selected: LineCandidate[]): LineCandidate[] | undefined => {
+      if (selected.length === count) {
+        const rows = [
+          ...solvedRows,
+          ...selected.filter((candidate) => candidate.kind === "row").map((candidate) => candidate.line)
+        ];
+        const columns = [
+          ...solvedColumns,
+          ...selected.filter((candidate) => candidate.kind === "column").map((candidate) => candidate.line)
+        ];
+        return canCompletePuzzle(tiles, rows, columns) ? selected : undefined;
+      }
+
+      const remaining = count - selected.length;
+      for (let index = start; index <= candidates.length - remaining; index += 1) {
+        const result = search(index + 1, [...selected, candidates[index]]);
+        if (result) return result;
+      }
+      return undefined;
+    };
+
+    const selected = search(0, []);
+    if (selected) return selected;
+  }
+  return [];
 }
 
 export function submitGuess(state: GameState): GameState {
@@ -162,21 +255,34 @@ export function submitGuess(state: GameState): GameState {
     return state;
   }
 
-  const solvedLines = [...state.solvedRows, ...state.solvedColumns];
   const candidateRows = Array.from({ length: GRID_SIZE }, (_, index) => {
-    const category = matchingCategory(rowTiles(state.tiles, index), CATEGORIES, solvedLines);
+    const category = matchingCategory(rowTiles(state.tiles, index), CATEGORIES, [
+      ...state.solvedRows,
+      ...state.solvedColumns
+    ]);
     return category ? [{ index, categoryId: category.id }] : [];
   }).flat();
   const candidateColumns = Array.from({ length: GRID_SIZE }, (_, index) => {
-    const category = matchingCategory(columnTiles(state.tiles, index), CATEGORIES, solvedLines);
+    const category = matchingCategory(columnTiles(state.tiles, index), CATEGORIES, [
+      ...state.solvedRows,
+      ...state.solvedColumns
+    ]);
     return category ? [{ index, categoryId: category.id }] : [];
   }).flat();
-  const newRows = candidateRows.filter((row) =>
-    matchesSolvedCrossings(state.tiles, row, "row", state.solvedColumns)
+  const candidates: LineCandidate[] = [
+    ...candidateRows.map((line) => ({ kind: "row" as const, line })),
+    ...candidateColumns.map((line) => ({ kind: "column" as const, line }))
+  ];
+  const selected = selectCompletableCandidates(
+    state.tiles,
+    state.solvedRows,
+    state.solvedColumns,
+    candidates
   );
-  const newColumns = candidateColumns.filter((column) =>
-    matchesSolvedCrossings(state.tiles, column, "column", state.solvedRows)
-  );
+  const newRows = selected.filter((candidate) => candidate.kind === "row").map((candidate) => candidate.line);
+  const newColumns = selected
+    .filter((candidate) => candidate.kind === "column")
+    .map((candidate) => candidate.line);
 
   if (newRows.length === 0 && newColumns.length === 0) {
     const wrongGuesses = state.wrongGuesses + 1;

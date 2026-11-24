@@ -86,8 +86,8 @@ export default function GamePage() {
         <p className="eyebrow">TODAY'S LITTLE BRAIN TEASER</p>
         <h1 id="game-title">Double Cross <span>Connect</span></h1>
         <p className="intro-copy">
-          Every word belongs to two connections. Any connection can appear in a row or column. A correct line
-          counts if it fits already-solved crossings; unsolved lines can still be mixed up.
+          Every word belongs to two connections. Any connection can appear in a row or column. A line counts
+          only if all six connections can still be completed.
         </p>
       </div>
 

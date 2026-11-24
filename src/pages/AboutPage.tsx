@@ -38,9 +38,9 @@ export default function AboutPage() {
         <div className="about-rule" />
         <h2>How to play</h2>
         <ol className="how-to-steps">
-          <li><span>01</span><p>Look for a pattern hiding in a row or a column.</p></li>
+          <li><span>01</span><p>Look for any connection in a row or column; connections can run either way.</p></li>
           <li><span>02</span><p>Tap one tile, then another to swap their places.</p></li>
-          <li><span>03</span><p>Press <strong>Connect</strong> when at least one full row or column fits a connection.</p></li>
+          <li><span>03</span><p>Press <strong>Connect</strong> when a full line fits a connection and keeps all six connections possible.</p></li>
           <li><span>04</span><p>Find all six connections. You get three guesses that solve nothing.</p></li>
         </ol>
         <Link className="connect-button about-play-button" to="/">
