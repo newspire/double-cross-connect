@@ -100,6 +100,74 @@ describe("Double Cross Connect rules", () => {
     expect(solved.wrongGuesses).toBe(0);
   });
 
+  it("does not accept a matching row that conflicts with an existing solved column", () => {
+    const game = {
+      ...boardState([
+        "hair",
+        "river",
+        "wine",
+        "lava",
+        "coffee",
+        "champagne",
+        "water",
+        "sun",
+        "stars"
+      ]),
+      solvedColumns: [{ index: 1, categoryId: "eyes" }]
+    };
+
+    const submitted = submitGuess(game);
+
+    expect(submitted.solvedRows).toEqual([]);
+    expect(submitted.solvedColumns).toEqual(game.solvedColumns);
+    expect(submitted.wrongGuesses).toBe(1);
+  });
+
+  it("accepts a matching row when it agrees with an existing solved column", () => {
+    const game = {
+      ...boardState([
+        "river",
+        "hair",
+        "wine",
+        "lava",
+        "sun",
+        "water",
+        "champagne",
+        "stars",
+        "coffee"
+      ]),
+      solvedColumns: [{ index: 1, categoryId: "eyes" }]
+    };
+
+    const submitted = submitGuess(game);
+
+    expect(submitted.solvedRows).toEqual([{ index: 0, categoryId: "red" }]);
+    expect(submitted.wrongGuesses).toBe(0);
+  });
+
+  it("does not accept a matching column that conflicts with an existing solved row", () => {
+    const game = {
+      ...boardState([
+        "river",
+        "sun",
+        "wine",
+        "champagne",
+        "hair",
+        "lava",
+        "water",
+        "stars",
+        "coffee"
+      ]),
+      solvedRows: [{ index: 0, categoryId: "red" }]
+    };
+
+    const submitted = submitGuess(game);
+
+    expect(submitted.solvedColumns).toEqual([]);
+    expect(submitted.solvedRows).toEqual(game.solvedRows);
+    expect(submitted.wrongGuesses).toBe(1);
+  });
+
   it("ends the game after three incorrect guesses and rejects further guesses", () => {
     let game = createGame();
     for (let guess = 0; guess < MAX_WRONG_GUESSES; guess += 1) {
