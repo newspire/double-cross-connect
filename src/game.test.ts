@@ -168,6 +168,28 @@ describe("Double Cross Connect rules", () => {
     expect(submitted.wrongGuesses).toBe(1);
   });
 
+  it("accepts a matching column when its crossing tile agrees with an existing solved row", () => {
+    const game = {
+      ...boardState([
+        "hair",
+        "river",
+        "wine",
+        "sun",
+        "lava",
+        "stars",
+        "coffee",
+        "water",
+        "champagne"
+      ]),
+      solvedRows: [{ index: 0, categoryId: "red" }]
+    };
+
+    const submitted = submitGuess(game);
+
+    expect(submitted.solvedColumns).toEqual([{ index: 1, categoryId: "flows" }]);
+    expect(submitted.wrongGuesses).toBe(0);
+  });
+
   it("ends the game after three incorrect guesses and rejects further guesses", () => {
     let game = createGame();
     for (let guess = 0; guess < MAX_WRONG_GUESSES; guess += 1) {

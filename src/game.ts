@@ -142,14 +142,23 @@ function columnTiles(tiles: TileId[], column: number): TileId[] {
   return Array.from({ length: GRID_SIZE }, (_, row) => tiles[row * GRID_SIZE + column]);
 }
 
-function compatibleAtIntersection(tiles: TileId[], row: SolvedLine, column: SolvedLine): boolean {
-  const tile = tiles[row.index * GRID_SIZE + column.index];
-  const rowCategory = ROW_CATEGORIES.find((category) => category.id === row.categoryId);
-  const columnCategory = COLUMN_CATEGORIES.find((category) => category.id === column.categoryId);
-  return Boolean(
-    rowCategory?.members.includes(tile) &&
-      columnCategory?.members.includes(tile)
-  );
+function matchesSolvedCrossings(
+  tiles: TileId[],
+  line: SolvedLine,
+  kind: LineKind,
+  crossingLines: SolvedLine[]
+): boolean {
+  const crossingCategories = kind === "row" ? COLUMN_CATEGORIES : ROW_CATEGORIES;
+  return crossingLines.every((crossingLine) => {
+    const category = crossingCategories.find((item) => item.id === crossingLine.categoryId);
+    if (!category) return false;
+
+    const tileIndex =
+      kind === "row"
+        ? line.index * GRID_SIZE + crossingLine.index
+        : crossingLine.index * GRID_SIZE + line.index;
+    return category.members.includes(tiles[tileIndex]);
+  });
 }
 
 export function submitGuess(state: GameState): GameState {
@@ -166,10 +175,10 @@ export function submitGuess(state: GameState): GameState {
     return category ? [{ index, categoryId: category.id }] : [];
   }).flat();
   const newRows = candidateRows.filter((row) =>
-    state.solvedColumns.every((column) => compatibleAtIntersection(state.tiles, row, column))
+    matchesSolvedCrossings(state.tiles, row, "row", state.solvedColumns)
   );
   const newColumns = candidateColumns.filter((column) =>
-    state.solvedRows.every((row) => compatibleAtIntersection(state.tiles, row, column))
+    matchesSolvedCrossings(state.tiles, column, "column", state.solvedRows)
   );
 
   if (newRows.length === 0 && newColumns.length === 0) {
