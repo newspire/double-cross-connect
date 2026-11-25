@@ -621,6 +621,35 @@ main {
   text-decoration: none;
 }
 
+.about-credits {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  color: #64747a;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.about-credits dl {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+.about-credits dt {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.about-credits dd,
+.about-credits p {
+  margin: 0;
+}
+
+.about-credits a {
+  color: var(--ink);
+}
+
 .share-card {
   padding: 25px;
   border: 1px solid rgba(23, 57, 74, 0.08);

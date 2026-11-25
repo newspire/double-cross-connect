@@ -47,6 +47,14 @@ export default function AboutPage() {
         <Link className="connect-button about-play-button" to="/">
           Let's play <span aria-hidden="true">↗</span>
         </Link>
+        <div className="about-credits">
+          <dl>
+            <div><dt>Created by</dt><dd>Andy Yates</dd></div>
+            <div><dt>Contact</dt><dd><a href="mailto:newspire@gmail.com">newspire@gmail.com</a></dd></div>
+          </dl>
+          <p>&copy; 2026 Andy Yates. All rights reserved.</p>
+          <p>Version 0.1.0</p>
+        </div>
       </div>
       <aside className="share-card" aria-labelledby="share-title">
         <div className="share-card-top">
