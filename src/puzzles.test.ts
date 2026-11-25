@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Andy Yates. All rights reserved.
 import { describe, expect, it } from "vitest";
-import { createGame, submitGuess } from "./game";
+import { createGame, submitGuess, swapTiles } from "./game";
 import { PUZZLES } from "./puzzles";
 
 describe("puzzle collection", () => {
@@ -42,6 +42,28 @@ describe("puzzle collection", () => {
       );
       const game = { ...createGame(puzzle), tiles: solution };
 
+      expect(submitGuess(game, puzzle).isWon).toBe(true);
+    }
+  });
+
+  it("starts each new puzzle unsolved and can solve it using legal swaps", () => {
+    const newPuzzles = PUZZLES.filter((item) => item.number >= 5 && item.number <= 10);
+    expect(newPuzzles).toHaveLength(6);
+    for (const puzzle of newPuzzles) {
+      let game = createGame(puzzle);
+      const firstGuess = submitGuess(game, puzzle);
+      expect(firstGuess.solvedRows).toHaveLength(0);
+      expect(firstGuess.solvedColumns).toHaveLength(0);
+
+      const solution = puzzle.categories.slice(0, 3).flatMap((row) =>
+        puzzle.categories.slice(3).map((column) =>
+          row.members.find((tile) => column.members.includes(tile))!
+        )
+      );
+      for (let index = 0; index < solution.length; index += 1) {
+        const currentIndex = game.tiles.indexOf(solution[index]);
+        if (currentIndex !== index) game = swapTiles(game, index, currentIndex);
+      }
       expect(submitGuess(game, puzzle).isWon).toBe(true);
     }
   });
