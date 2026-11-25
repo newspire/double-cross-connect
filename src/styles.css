@@ -551,11 +551,16 @@ main {
   max-width: 900px;
   min-height: 620px;
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.75fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  gap: 75px;
   margin: 0 auto;
   padding: 65px 20px;
+}
+
+.share-page {
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 65px 0;
 }
 
 .about-copy h1 {
@@ -908,8 +913,8 @@ main {
     padding: 42px 0;
   }
 
-  .share-card {
-    max-width: 430px;
+  .share-page {
+    padding: 45px 0;
   }
 }
 
