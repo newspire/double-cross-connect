@@ -118,12 +118,12 @@ export default function GamePage() {
 
       <div className="puzzle-layout">
         <section className="board-card" aria-label="Puzzle board">
-          <p className="puzzle-attribution">#{puzzle.number} by {puzzle.author}</p>
-          {isPractice && <p className="practice-note">Practice replay · not counted in your stats</p>}
           <div className="board-heading">
             <div>
               <p className="eyebrow">ONE GRID. SIX CONNECTIONS.</p>
               <h2>Make it click.</h2>
+              <p className="puzzle-attribution">#{puzzle.number} by {puzzle.author}</p>
+              {isPractice && <p className="practice-note">Practice replay · not counted in your stats</p>}
             </div>
             <div className="guesses" aria-label={`${MAX_WRONG_GUESSES - game.wrongGuesses} guesses left`}>
               <span className="guesses-label">GUESSES LEFT</span>
