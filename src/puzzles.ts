@@ -99,6 +99,31 @@ export const PUZZLES: PuzzleDefinition[] = [
       map: { id: "map", label: "map" }
     },
     initialTiles: ["compass", "guitar", "map", "sheet music", "trumpet", "bat", "oar", "scorecard", "racket"]
+  },
+  {
+    id: "double-cross-004",
+    number: 4,
+    author: "@newspire",
+    categories: [
+      { id: "monkey", label: "Monkey", members: ["wrench", "business", "bread"] },
+      { id: "orange", label: "Orange", members: ["twist", "fire", "pumpkin"] },
+      { id: "hole", label: "Hole", members: ["screw", "post", "pot"] },
+      { id: "turn", label: "Turn", members: ["wrench", "twist", "screw"] },
+      { id: "man", label: "Man", members: ["business", "fire", "post"] },
+      { id: "pie", label: "Pie", members: ["bread", "pumpkin", "pot"] }
+    ],
+    tiles: {
+      wrench: { id: "wrench", label: "wrench" },
+      business: { id: "business", label: "business" },
+      bread: { id: "bread", label: "bread" },
+      twist: { id: "twist", label: "twist" },
+      fire: { id: "fire", label: "fire" },
+      pumpkin: { id: "pumpkin", label: "pumpkin" },
+      screw: { id: "screw", label: "screw" },
+      post: { id: "post", label: "post" },
+      pot: { id: "pot", label: "pot" }
+    },
+    initialTiles: ["fire", "bread", "screw", "post", "pumpkin", "wrench", "twist", "pot", "business"]
   }
 ];
 
