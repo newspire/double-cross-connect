@@ -42,6 +42,7 @@ export default function AboutPage() {
           <li><span>02</span><p>Tap one tile, then another to swap their places.</p></li>
           <li><span>03</span><p>Press <strong>Connect</strong> when a full line fits a connection and keeps all six connections possible.</p></li>
           <li><span>04</span><p>Find all six connections. You get three guesses that solve nothing.</p></li>
+          <li><span>05</span><p>Track results on the Stats page. Replay a finished puzzle as practice without changing your stats.</p></li>
         </ol>
         <Link className="connect-button about-play-button" to="/">
           Let's play <span aria-hidden="true">↗</span>

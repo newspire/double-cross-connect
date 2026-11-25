@@ -1,6 +1,7 @@
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import AboutPage from "./pages/AboutPage";
 import GamePage from "./pages/GamePage";
+import StatsPage from "./pages/StatsPage";
 
 export default function App() {
   return (
@@ -18,12 +19,14 @@ export default function App() {
           </Link>
           <nav aria-label="Main navigation">
             <Link to="/">Play</Link>
+            <Link to="/stats">Stats</Link>
             <Link to="/about">About</Link>
           </nav>
         </header>
         <main>
           <Routes>
             <Route path="/" element={<GamePage />} />
+            <Route path="/stats" element={<StatsPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="*" element={<GamePage />} />
           </Routes>

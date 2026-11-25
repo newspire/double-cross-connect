@@ -1,24 +1,17 @@
+import {
+  getPuzzleById,
+  PUZZLES,
+  type Category,
+  type PuzzleDefinition,
+  type TileId
+} from "./puzzles";
+
+export type { Category, PuzzleDefinition, PuzzleTile, TileId } from "./puzzles";
+
 export const GRID_SIZE = 3;
 export const MAX_WRONG_GUESSES = 3;
 
-export type TileId =
-  | "hair"
-  | "river"
-  | "wine"
-  | "sun"
-  | "lava"
-  | "coffee"
-  | "stars"
-  | "water"
-  | "champagne";
-
 export type LineKind = "row" | "column";
-
-export interface Category {
-  id: string;
-  label: string;
-  members: TileId[];
-}
 
 export interface SolvedLine {
   index: number;
@@ -30,63 +23,25 @@ interface LineCandidate {
   line: SolvedLine;
 }
 
-export interface PuzzleTile {
-  id: TileId;
-  label: string;
-}
-
 export interface GameState {
+  puzzleId: string;
   tiles: TileId[];
   solvedRows: SolvedLine[];
   solvedColumns: SolvedLine[];
   wrongGuesses: number;
+  guesses: number;
   isComplete: boolean;
   isWon: boolean;
 }
 
-export const CATEGORIES: Category[] = [
-  { id: "red", label: "red", members: ["hair", "river", "wine"] },
-  { id: "hot", label: "hot", members: ["sun", "lava", "coffee"] },
-  {
-    id: "sparkles",
-    label: "Things that sparkle",
-    members: ["stars", "water", "champagne"]
-  },
-  { id: "eyes", label: "In your eyes", members: ["hair", "sun", "stars"] },
-  { id: "flows", label: "flows", members: ["river", "lava", "water"] },
-  { id: "drink", label: "drink", members: ["wine", "coffee", "champagne"] }
-];
-
-export const TILES: Record<TileId, PuzzleTile> = {
-  hair: { id: "hair", label: "hair" },
-  river: { id: "river", label: "river" },
-  wine: { id: "wine", label: "wine" },
-  sun: { id: "sun", label: "sun" },
-  lava: { id: "lava", label: "lava" },
-  coffee: { id: "coffee", label: "coffee" },
-  stars: { id: "stars", label: "stars" },
-  water: { id: "water", label: "water" },
-  champagne: { id: "champagne", label: "Champagne" }
-};
-
-export const INITIAL_TILES: TileId[] = [
-  "wine",
-  "lava",
-  "hair",
-  "river",
-  "stars",
-  "coffee",
-  "water",
-  "sun",
-  "champagne"
-];
-
-export function createGame(): GameState {
+export function createGame(puzzle: PuzzleDefinition = PUZZLES[0]): GameState {
   return {
-    tiles: [...INITIAL_TILES],
+    puzzleId: puzzle.id,
+    tiles: [...puzzle.initialTiles],
     solvedRows: [],
     solvedColumns: [],
     wrongGuesses: 0,
+    guesses: 0,
     isComplete: false,
     isWon: false
   };
@@ -142,6 +97,7 @@ function columnTiles(tiles: TileId[], column: number): TileId[] {
 
 function canCompletePuzzle(
   tiles: TileId[],
+  categories: Category[],
   solvedRows: SolvedLine[],
   solvedColumns: SolvedLine[]
 ): boolean {
@@ -154,7 +110,7 @@ function canCompletePuzzle(
       (line) =>
         line.index < 0 ||
         line.index >= GRID_SIZE ||
-        !CATEGORIES.some((category) => category.id === line.categoryId)
+        !categories.some((category) => category.id === line.categoryId)
     )
   ) {
     return false;
@@ -213,11 +169,12 @@ function canCompletePuzzle(
     return false;
   };
 
-  return assignLine(0, CATEGORIES);
+  return assignLine(0, categories);
 }
 
 function selectCompletableCandidates(
   tiles: TileId[],
+  categories: Category[],
   solvedRows: SolvedLine[],
   solvedColumns: SolvedLine[],
   candidates: LineCandidate[]
@@ -233,7 +190,7 @@ function selectCompletableCandidates(
           ...solvedColumns,
           ...selected.filter((candidate) => candidate.kind === "column").map((candidate) => candidate.line)
         ];
-        return canCompletePuzzle(tiles, rows, columns) ? selected : undefined;
+        return canCompletePuzzle(tiles, categories, rows, columns) ? selected : undefined;
       }
 
       const remaining = count - selected.length;
@@ -250,20 +207,24 @@ function selectCompletableCandidates(
   return [];
 }
 
-export function submitGuess(state: GameState): GameState {
+export function submitGuess(
+  state: GameState,
+  puzzle: PuzzleDefinition = getPuzzleById(state.puzzleId)
+): GameState {
   if (state.isComplete || state.wrongGuesses >= MAX_WRONG_GUESSES) {
     return state;
   }
+  const guessingState = { ...state, guesses: state.guesses + 1 };
 
   const candidateRows = Array.from({ length: GRID_SIZE }, (_, index) => {
-    const category = matchingCategory(rowTiles(state.tiles, index), CATEGORIES, [
+    const category = matchingCategory(rowTiles(state.tiles, index), puzzle.categories, [
       ...state.solvedRows,
       ...state.solvedColumns
     ]);
     return category ? [{ index, categoryId: category.id }] : [];
   }).flat();
   const candidateColumns = Array.from({ length: GRID_SIZE }, (_, index) => {
-    const category = matchingCategory(columnTiles(state.tiles, index), CATEGORIES, [
+    const category = matchingCategory(columnTiles(state.tiles, index), puzzle.categories, [
       ...state.solvedRows,
       ...state.solvedColumns
     ]);
@@ -275,6 +236,7 @@ export function submitGuess(state: GameState): GameState {
   ];
   const selected = selectCompletableCandidates(
     state.tiles,
+    puzzle.categories,
     state.solvedRows,
     state.solvedColumns,
     candidates
@@ -287,7 +249,7 @@ export function submitGuess(state: GameState): GameState {
   if (newRows.length === 0 && newColumns.length === 0) {
     const wrongGuesses = state.wrongGuesses + 1;
     return {
-      ...state,
+      ...guessingState,
       wrongGuesses,
       isComplete: wrongGuesses >= MAX_WRONG_GUESSES,
       isWon: false
@@ -297,7 +259,7 @@ export function submitGuess(state: GameState): GameState {
   const solvedRows = [...state.solvedRows, ...newRows];
   const solvedColumns = [...state.solvedColumns, ...newColumns];
   const isWon = solvedRows.length === GRID_SIZE && solvedColumns.length === GRID_SIZE;
-  const next = { ...state, solvedRows, solvedColumns };
+  const next = { ...guessingState, solvedRows, solvedColumns };
   const unlockedPositions = state.tiles.filter((_, index) => !isPositionLocked(next, index)).length;
   return {
     ...next,

@@ -7,6 +7,7 @@ import {
   swapTiles,
   type GameState
 } from "./game";
+import { PUZZLES } from "./puzzles";
 
 function boardState(tiles: GameState["tiles"]): GameState {
   return { ...createGame(), tiles };
@@ -97,6 +98,34 @@ describe("Double Cross Connect rules", () => {
 
     expect(solved.solvedRows).toEqual([{ index: 2, categoryId: "hot" }]);
     expect(solved.solvedColumns).toEqual([]);
+    expect(solved.wrongGuesses).toBe(0);
+  });
+
+  it("uses the selected puzzle's category and tile data", () => {
+    const puzzle = PUZZLES[1];
+    const game = {
+      ...createGame(puzzle),
+      tiles: [
+        "rose",
+        "ruby",
+        "cherry",
+        "iris",
+        "sapphire",
+        "blueberry",
+        "clover",
+        "emerald",
+        "lime"
+      ]
+    };
+
+    const solved = submitGuess(game, puzzle);
+
+    expect(solved.solvedRows).toEqual([
+      { index: 0, categoryId: "red" },
+      { index: 1, categoryId: "blue" },
+      { index: 2, categoryId: "green" }
+    ]);
+    expect(solved.guesses).toBe(1);
     expect(solved.wrongGuesses).toBe(0);
   });
 

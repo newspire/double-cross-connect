@@ -1,29 +1,42 @@
 import { useState } from "react";
 import {
-  CATEGORIES,
   createGame,
   isPositionLocked,
   MAX_WRONG_GUESSES,
   GRID_SIZE,
   submitGuess,
   swapTiles,
-  TILES,
   type Category,
   type GameState
 } from "../game";
+import { PUZZLES } from "../puzzles";
+import {
+  getOldestUnplayedPuzzle,
+  hasPlayedPuzzle,
+  recordPuzzleResult
+} from "../player";
+import { usePlayerProfile } from "../usePlayerProfile";
 
 export default function GamePage() {
-  const [game, setGame] = useState<GameState>(createGame);
+  const player = usePlayerProfile();
+  const orderedPuzzles = [...PUZZLES].sort((a, b) => a.number - b.number);
+  const [puzzle, setPuzzle] = useState(() => getOldestUnplayedPuzzle(orderedPuzzles, player.data));
+  const [game, setGame] = useState<GameState>(() => createGame(puzzle));
   const [selected, setSelected] = useState<number | null>(null);
   const [highlighted, setHighlighted] = useState<Category | null>(null);
+  const [isPractice, setIsPractice] = useState(() => hasPlayedPuzzle(player.data, puzzle.id));
   const [feedback, setFeedback] = useState("Find the hidden connections. Every row and column has one.");
 
-  const startNewGame = () => {
-    setGame(createGame());
+  const startPuzzle = (nextPuzzle: typeof puzzle, practice = hasPlayedPuzzle(player.data, nextPuzzle.id)) => {
+    setPuzzle(nextPuzzle);
+    setGame(createGame(nextPuzzle));
     setSelected(null);
     setHighlighted(null);
+    setIsPractice(practice);
     setFeedback("Find the hidden connections. Every row and column has one.");
   };
+
+  const startPracticeGame = () => startPuzzle(puzzle, true);
 
   const isLocked = (index: number) => isPositionLocked(game, index);
   const isHighlighted = (index: number) => {
@@ -53,9 +66,18 @@ export default function GamePage() {
   };
 
   const handleConnect = () => {
-    const next = submitGuess(game);
+    const next = submitGuess(game, puzzle);
     setGame(next);
     setSelected(null);
+    if (next.isComplete && !isPractice) {
+      const updatedData = recordPuzzleResult(
+        player.data,
+        puzzle,
+        next.isWon ? "won" : "lost",
+        next.guesses
+      );
+      if (updatedData !== player.data) player.persist(updatedData);
+    }
     if (next.isWon) {
       setFeedback("Brilliant! You found every connection.");
     } else if (next.isComplete && next.wrongGuesses === game.wrongGuesses) {
@@ -78,7 +100,10 @@ export default function GamePage() {
   const solvedCategoryIds = new Set(
     [...game.solvedRows, ...game.solvedColumns].map((line) => line.categoryId)
   );
-  const discovered = CATEGORIES.filter((category) => solvedCategoryIds.has(category.id));
+  const discovered = puzzle.categories.filter((category) => solvedCategoryIds.has(category.id));
+  const puzzleIndex = orderedPuzzles.findIndex((candidate) => candidate.id === puzzle.id);
+  const previousPuzzle = orderedPuzzles[puzzleIndex - 1];
+  const nextPuzzle = orderedPuzzles[puzzleIndex + 1];
 
   return (
     <section className="game-page" aria-labelledby="game-title">
@@ -93,6 +118,8 @@ export default function GamePage() {
 
       <div className="puzzle-layout">
         <section className="board-card" aria-label="Puzzle board">
+          <p className="puzzle-attribution">#{puzzle.number} by {puzzle.author}</p>
+          {isPractice && <p className="practice-note">Practice replay · not counted in your stats</p>}
           <div className="board-heading">
             <div>
               <p className="eyebrow">ONE GRID. SIX CONNECTIONS.</p>
@@ -110,7 +137,7 @@ export default function GamePage() {
 
           <div className="puzzle-grid" role="group" aria-label="Nine puzzle tiles">
             {game.tiles.map((tileId, index) => {
-              const tile = TILES[tileId];
+              const tile = puzzle.tiles[tileId];
               const locked = isLocked(index);
               return (
                 <button
@@ -148,11 +175,30 @@ export default function GamePage() {
               <span aria-hidden="true">↗</span>
             </button>
             {game.isComplete && (
-              <button type="button" className="restart-button" onClick={startNewGame}>
+              <button type="button" className="restart-button" onClick={startPracticeGame}>
                 Play again
               </button>
             )}
+            {game.isComplete && (
+              <nav className="puzzle-navigation" aria-label="Puzzle navigation">
+                <button
+                  type="button"
+                  onClick={() => previousPuzzle && startPuzzle(previousPuzzle)}
+                  disabled={!previousPuzzle}
+                >
+                  <span aria-hidden="true">←</span> Previous puzzle
+                </button>
+                <button
+                  type="button"
+                  onClick={() => nextPuzzle && startPuzzle(nextPuzzle)}
+                  disabled={!nextPuzzle}
+                >
+                  Next puzzle <span aria-hidden="true">→</span>
+                </button>
+              </nav>
+            )}
           </div>
+          {player.error && <p className="storage-warning" role="alert">{player.error}</p>}
         </section>
 
         <aside className="connections-card" aria-labelledby="connections-title">
@@ -179,7 +225,7 @@ export default function GamePage() {
                       onFocus={() => setHighlighted(category)}
                       onBlur={() => setHighlighted(null)}
                       aria-label={`${lineKind === "row" ? "Row" : "Column"} connection: ${category.label}: ${category.members
-                        .map((tileId) => TILES[tileId].label)
+                        .map((tileId) => puzzle.tiles[tileId].label)
                         .join(", ")}`}
                     >
                       <span className="connection-check" aria-hidden="true">✓</span>
@@ -187,7 +233,7 @@ export default function GamePage() {
                         <strong>{category.label}</strong>
                         <small>{lineKind.toUpperCase()}</small>
                         <span className="connection-members">
-                          {category.members.map((tileId) => TILES[tileId].label).join(" · ")}
+                          {category.members.map((tileId) => puzzle.tiles[tileId].label).join(" · ")}
                         </span>
                       </span>
                       <span className="connection-arrow" aria-hidden="true">↗</span>
