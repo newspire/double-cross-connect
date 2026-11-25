@@ -29,6 +29,15 @@ describe("local player data", () => {
     expect(getOldestUnplayedPuzzle([...PUZZLES].reverse(), afterThird).id).toBe(PUZZLES[1].id);
   });
 
+  it("chooses the latest puzzle when all have been played", () => {
+    const data = PUZZLES.reduce(
+      (player, puzzle, index) => recordPuzzleResult(player, puzzle, index % 2 ? "lost" : "won", 3),
+      createPlayerData()
+    );
+
+    expect(getOldestUnplayedPuzzle([...PUZZLES].reverse(), data).id).toBe(PUZZLES[PUZZLES.length - 1].id);
+  });
+
   it("stores results locally and leaves a replay of a played puzzle unrecorded", () => {
     const storage = memoryStorage();
     const data = recordPuzzleResult(createPlayerData(), PUZZLES[0], "won", 1, "2026-01-01T00:00:00.000Z");

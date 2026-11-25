@@ -79,7 +79,7 @@ export function getOldestUnplayedPuzzle(
   const nextPuzzle = ordered.find((puzzle) => !hasPlayedPuzzle(data, puzzle.id));
   if (nextPuzzle) return nextPuzzle;
   if (ordered.length === 0) throw new Error("At least one puzzle is required.");
-  return ordered[0];
+  return ordered[ordered.length - 1];
 }
 
 export function recordPuzzleResult(
