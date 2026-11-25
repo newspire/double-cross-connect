@@ -20,6 +20,11 @@ describe("Double Cross Connect rules", () => {
 
     expect(moved.tiles.slice(0, 2)).toEqual(["lava", "wine"]);
     expect(game.tiles.slice(0, 2)).toEqual(["wine", "lava"]);
+    expect(game.hasStarted).toBe(false);
+    expect(moved.hasStarted).toBe(true);
+    expect(swapTiles(moved, 0, 1).hasStarted).toBe(true);
+    expect(swapTiles(game, 0, 0).hasStarted).toBe(false);
+    expect(submitGuess(game).hasStarted).toBe(true);
   });
 
   it("does not allow a swap from or into a solved row or column", () => {

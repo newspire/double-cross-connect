@@ -179,7 +179,7 @@ export default function GamePage() {
                 Play again
               </button>
             )}
-            {game.isComplete && (
+            {(!game.hasStarted || game.isComplete) && (
               <nav className="puzzle-navigation" aria-label="Puzzle navigation">
                 <button
                   type="button"

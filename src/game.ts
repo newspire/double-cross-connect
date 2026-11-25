@@ -30,6 +30,7 @@ export interface GameState {
   solvedColumns: SolvedLine[];
   wrongGuesses: number;
   guesses: number;
+  hasStarted: boolean;
   isComplete: boolean;
   isWon: boolean;
 }
@@ -42,6 +43,7 @@ export function createGame(puzzle: PuzzleDefinition = PUZZLES[0]): GameState {
     solvedColumns: [],
     wrongGuesses: 0,
     guesses: 0,
+    hasStarted: false,
     isComplete: false,
     isWon: false
   };
@@ -72,7 +74,7 @@ export function swapTiles(state: GameState, first: number, second: number): Game
 
   const tiles = [...state.tiles];
   [tiles[first], tiles[second]] = [tiles[second], tiles[first]];
-  return { ...state, tiles };
+  return { ...state, tiles, hasStarted: true };
 }
 
 function matchingCategory(
@@ -214,7 +216,7 @@ export function submitGuess(
   if (state.isComplete || state.wrongGuesses >= MAX_WRONG_GUESSES) {
     return state;
   }
-  const guessingState = { ...state, guesses: state.guesses + 1 };
+  const guessingState = { ...state, guesses: state.guesses + 1, hasStarted: true };
 
   const candidateRows = Array.from({ length: GRID_SIZE }, (_, index) => {
     const category = matchingCategory(rowTiles(state.tiles, index), puzzle.categories, [
