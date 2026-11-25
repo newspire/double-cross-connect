@@ -4,6 +4,8 @@ A 3×3 word puzzle PWA. Swap tiles so every row and column matches a category; a
 
 Puzzles have stable IDs, sequence numbers, and author credits. The game starts with the oldest puzzle without a recorded result, or the latest puzzle if all have been played. Wins, losses, and guesses are stored in browser local storage and shown on the Stats page. Replays of completed puzzles are practice games and do not change stats.
 
+On supported browsers, an **Install app** button appears when the browser offers installation. On iPhone or iPad, use Safari's Share menu and choose **Add to Home Screen**.
+
 ## Run locally
 
 ```sh

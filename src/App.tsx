@@ -1,4 +1,5 @@
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
+import InstallButton from "./InstallButton";
 import AboutPage from "./pages/AboutPage";
 import GamePage from "./pages/GamePage";
 import SharePage from "./pages/SharePage";
@@ -25,6 +26,7 @@ export default function App() {
             <Link to="/about">About</Link>
           </nav>
         </header>
+        <InstallButton />
         <main>
           <Routes>
             <Route path="/" element={<GamePage />} />
