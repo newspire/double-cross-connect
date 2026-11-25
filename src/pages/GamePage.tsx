@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   createGame,
   isPositionLocked,
@@ -17,6 +17,13 @@ import {
 } from "../player";
 import { usePlayerProfile } from "../usePlayerProfile";
 
+interface SwapAnimation {
+  first: number;
+  second: number;
+  x: number;
+  y: number;
+}
+
 export default function GamePage() {
   const player = usePlayerProfile();
   const orderedPuzzles = [...PUZZLES].sort((a, b) => a.number - b.number);
@@ -26,12 +33,30 @@ export default function GamePage() {
   const [highlighted, setHighlighted] = useState<Category | null>(null);
   const [isPractice, setIsPractice] = useState(() => hasPlayedPuzzle(player.data, puzzle.id));
   const [feedback, setFeedback] = useState("Find the hidden connections. Every row and column has one.");
+  const [swapAnimation, setSwapAnimation] = useState<SwapAnimation | null>(null);
+  const tileRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  useLayoutEffect(() => {
+    if (!swapAnimation || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const { first, second, x, y } = swapAnimation;
+    const animations = [
+      { tile: tileRefs.current[first], x, y },
+      { tile: tileRefs.current[second], x: -x, y: -y }
+    ].flatMap(({ tile, x: offsetX, y: offsetY }) =>
+      tile ? [tile.animate([
+        { transform: `translate(${offsetX}px, ${offsetY}px)`, backgroundColor: "#fff0e8", zIndex: 2 },
+        { transform: "translate(0, 0)", backgroundColor: "#fbf8f2", zIndex: 2 }
+      ], { duration: 500, easing: "ease-in-out" })] : []
+    );
+    return () => animations.forEach((animation) => animation.cancel());
+  }, [swapAnimation]);
 
   const startPuzzle = (nextPuzzle: typeof puzzle, practice = hasPlayedPuzzle(player.data, nextPuzzle.id)) => {
     setPuzzle(nextPuzzle);
     setGame(createGame(nextPuzzle));
     setSelected(null);
     setHighlighted(null);
+    setSwapAnimation(null);
     setIsPractice(practice);
     setFeedback("Find the hidden connections. Every row and column has one.");
   };
@@ -60,15 +85,26 @@ export default function GamePage() {
       setFeedback("Selection cleared. Choose a tile to move.");
       return;
     }
+    const firstTile = tileRefs.current[selected];
+    const secondTile = tileRefs.current[index];
+    if (firstTile && secondTile) {
+      setSwapAnimation({
+        first: selected,
+        second: index,
+        x: secondTile.offsetLeft - firstTile.offsetLeft,
+        y: secondTile.offsetTop - firstTile.offsetTop
+      });
+    }
     setGame((current) => swapTiles(current, selected, index));
     setSelected(null);
-    setFeedback("Tiles swapped. Connect when you think the grid is right.");
+    setFeedback(`Swapped ${puzzle.tiles[game.tiles[selected]].label} and ${puzzle.tiles[game.tiles[index]].label}. Connect when you're ready.`);
   };
 
   const handleConnect = () => {
     const next = submitGuess(game, puzzle);
     setGame(next);
     setSelected(null);
+    setSwapAnimation(null);
     if (next.isComplete && !isPractice) {
       const updatedData = recordPuzzleResult(
         player.data,
@@ -151,6 +187,7 @@ export default function GamePage() {
                     .filter(Boolean)
                     .join(" ")}
                   key={index}
+                  ref={(element) => { tileRefs.current[index] = element; }}
                   onClick={() => handleTileClick(index)}
                   disabled={locked || game.isComplete}
                   aria-pressed={selected === index}
