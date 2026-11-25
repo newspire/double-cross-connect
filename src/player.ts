@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Andy Yates. All rights reserved.
 import type { PuzzleDefinition } from "./puzzles";
 import { GRID_SIZE, MAX_WRONG_GUESSES } from "./game";
 

@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Andy Yates. All rights reserved.
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import InstallButton from "./InstallButton";
 import AboutPage from "./pages/AboutPage";

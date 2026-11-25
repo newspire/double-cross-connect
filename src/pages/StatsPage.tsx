@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Andy Yates. All rights reserved.
 import { summarizePlayerData } from "../player";
 import { usePlayerProfile } from "../usePlayerProfile";
 

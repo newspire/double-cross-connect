@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Andy Yates. All rights reserved.
 export interface InstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }

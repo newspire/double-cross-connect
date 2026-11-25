@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Andy Yates. All rights reserved.
 import { useLayoutEffect, useRef, useState } from "react";
 import {
   createGame,
@@ -16,6 +17,7 @@ import {
   recordPuzzleResult
 } from "../player";
 import { usePlayerProfile } from "../usePlayerProfile";
+import { trackGame } from "../analytics";
 
 interface SwapAnimation {
   first: number;
@@ -35,6 +37,7 @@ export default function GamePage() {
   const [feedback, setFeedback] = useState("Find the hidden connections. Every row and column has one.");
   const [swapAnimation, setSwapAnimation] = useState<SwapAnimation | null>(null);
   const tileRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const tracker = useRef(trackGame(puzzle.id, puzzle.number, isPractice));
 
   useLayoutEffect(() => {
     if (!swapAnimation || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -52,6 +55,7 @@ export default function GamePage() {
   }, [swapAnimation]);
 
   const startPuzzle = (nextPuzzle: typeof puzzle, practice = hasPlayedPuzzle(player.data, nextPuzzle.id)) => {
+    tracker.current = trackGame(nextPuzzle.id, nextPuzzle.number, practice);
     setPuzzle(nextPuzzle);
     setGame(createGame(nextPuzzle));
     setSelected(null);
@@ -95,13 +99,16 @@ export default function GamePage() {
         y: secondTile.offsetTop - firstTile.offsetTop
       });
     }
-    setGame((current) => swapTiles(current, selected, index));
+    const next = swapTiles(game, selected, index);
+    tracker.current(game, next);
+    setGame(next);
     setSelected(null);
     setFeedback(`Swapped ${puzzle.tiles[game.tiles[selected]].label} and ${puzzle.tiles[game.tiles[index]].label}. Connect when you're ready.`);
   };
 
   const handleConnect = () => {
     const next = submitGuess(game, puzzle);
+    tracker.current(game, next);
     setGame(next);
     setSelected(null);
     setSwapAnimation(null);

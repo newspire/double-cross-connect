@@ -1,3 +1,4 @@
+# Copyright (c) 2026 Andy Yates. All rights reserved.
 name: Deploy to GitHub Pages
 
 on:
@@ -19,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAGES: "true"
+      VITE_POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
     permissions:
       contents: read
       pages: read

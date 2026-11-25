@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Andy Yates. All rights reserved.
 import { useState } from "react";
 import {
   createPlayerData,

@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Andy Yates. All rights reserved.
 import { Link } from "react-router-dom";
 
 export default function AboutPage() {
@@ -21,6 +22,14 @@ export default function AboutPage() {
         <Link className="connect-button about-play-button" to="/">
           Let's play <span aria-hidden="true">↗</span>
         </Link>
+        <h2>Privacy</h2>
+        <p>
+          When analytics are enabled, game starts and finishes are sent to PostHog with the puzzle number,
+          result, guess count and whether it was a practice replay. A random ID is used for each game; no
+          names or email addresses are sent by the game. PostHog receives your IP address when events are
+          sent. The game respects your browser's Do Not Track setting. Events played offline may be stored
+          on your device until they can be sent.
+        </p>
         <div className="about-credits">
           <dl>
             <div><dt>Created by</dt><dd>Andy Yates</dd></div>
