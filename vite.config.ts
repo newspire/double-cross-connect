@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "icons/icon-192.png", "icons/icon-512.png"],
+      includeAssets: ["favicon.svg", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "icons/apple-touch-icon.png"],
       manifest: {
         name: "Double Cross Connect",
         short_name: "Double Cross",
@@ -35,7 +35,7 @@ export default defineConfig({
             purpose: "any"
           },
           {
-            src: "icons/icon-512.png",
+            src: "icons/icon-maskable-512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable"
