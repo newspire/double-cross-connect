@@ -275,6 +275,31 @@ export const PUZZLES: PuzzleDefinition[] = [
       wine: { id: "wine", label: "wine" }
     },
     initialTiles: ["coffee bean", "wine", "apple tree", "grape", "cider", "coffee plant", "grapevine", "apple", "coffee"]
+  },
+  {
+    id: "double-cross-011",
+    number: 11,
+    author: "@newspire",
+    categories: [
+      { id: "texas", label: "Cities in Texas", members: ["paris", "pasadena", "longview"] },
+      { id: "iowa", label: "Cities in Iowa", members: ["knoxville", "norwalk", "des moines"] },
+      { id: "oregon", label: "Cities in Oregon", members: ["springfield", "ontario", "redmond"] },
+      { id: "tennessee", label: "Cities in Tennessee", members: ["paris", "knoxville", "springfield"] },
+      { id: "california", label: "Cities in California", members: ["pasadena", "norwalk", "ontario"] },
+      { id: "washington", label: "Cities in Washington", members: ["longview", "des moines", "redmond"] }
+    ],
+    tiles: {
+      paris: { id: "paris", label: "Paris" },
+      pasadena: { id: "pasadena", label: "Pasadena" },
+      longview: { id: "longview", label: "Longview" },
+      knoxville: { id: "knoxville", label: "Knoxville" },
+      norwalk: { id: "norwalk", label: "Norwalk" },
+      "des moines": { id: "des moines", label: "Des Moines" },
+      springfield: { id: "springfield", label: "Springfield" },
+      ontario: { id: "ontario", label: "Ontario" },
+      redmond: { id: "redmond", label: "Redmond" }
+    },
+    initialTiles: ["paris", "norwalk", "redmond", "longview", "knoxville", "ontario", "des moines", "springfield", "pasadena"]
   }
 ];
 

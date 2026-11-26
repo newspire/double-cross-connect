@@ -47,8 +47,7 @@ describe("puzzle collection", () => {
   });
 
   it("starts each new puzzle unsolved and can solve it using legal swaps", () => {
-    const newPuzzles = PUZZLES.filter((item) => item.number >= 5 && item.number <= 10);
-    expect(newPuzzles).toHaveLength(6);
+    const newPuzzles = PUZZLES.filter((item) => item.number >= 5);
     for (const puzzle of newPuzzles) {
       let game = createGame(puzzle);
       const firstGuess = submitGuess(game, puzzle);
