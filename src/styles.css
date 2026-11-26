@@ -644,7 +644,8 @@ main {
   font-size: 10px;
 }
 
-.how-to-steps p {
+.how-to-steps p,
+.about-privacy p {
   margin: 0;
   color: #64747a;
   font-size: 12px;
@@ -654,6 +655,14 @@ main {
 .about-play-button {
   width: fit-content;
   text-decoration: none;
+}
+
+.about-privacy {
+  margin-top: 36px;
+}
+
+.about-privacy p {
+  margin-top: 19px;
 }
 
 .about-credits {

@@ -22,14 +22,15 @@ export default function AboutPage() {
         <Link className="connect-button about-play-button" to="/">
           Let's play <span aria-hidden="true">↗</span>
         </Link>
-        <h2>Privacy</h2>
-        <p>
-          When analytics are enabled, game starts and finishes are sent to PostHog with the puzzle number,
-          result, guess count and whether it was a practice replay. A random ID is used for each game; no
-          names or email addresses are sent by the game. PostHog receives your IP address when events are
-          sent. The game respects your browser's Do Not Track setting. Events played offline may be stored
-          on your device until they can be sent.
-        </p>
+        <section className="about-privacy" aria-labelledby="privacy-title">
+          <h2 id="privacy-title">Privacy</h2>
+          <p>
+            This game collects and sends basic statistics, including the results and guess count for each puzzle.
+            No names or email addresses are sent. PostHog receives your IP address, and a random ID is used
+            for each game. The game respects your browser's Do Not Track setting. Events played offline may be
+            stored on your device until they can be sent.
+          </p>
+        </section>
         <div className="about-credits">
           <dl>
             <div><dt>Created by</dt><dd>Andy Yates</dd></div>
