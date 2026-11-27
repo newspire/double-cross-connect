@@ -8,15 +8,17 @@ import {
   swapTiles,
   type GameState
 } from "./game";
-import { PUZZLES } from "./puzzles";
+import { getPuzzleById } from "./puzzles";
+
+const examplePuzzle = getPuzzleById("double-cross-001");
 
 function boardState(tiles: GameState["tiles"]): GameState {
-  return { ...createGame(), tiles };
+  return { ...createGame(examplePuzzle), tiles };
 }
 
 describe("Double Cross Connect rules", () => {
   it("swaps two unlocked tiles without changing the prior board", () => {
-    const game = createGame();
+    const game = createGame(examplePuzzle);
     const moved = swapTiles(game, 0, 1);
 
     expect(moved.tiles.slice(0, 2)).toEqual(["lava", "wine"]);
@@ -29,8 +31,8 @@ describe("Double Cross Connect rules", () => {
   });
 
   it("does not allow a swap from or into a solved row or column", () => {
-    const game = { ...createGame(), solvedRows: [{ index: 0, categoryId: "red" }] };
-    const columnLocked = { ...createGame(), solvedColumns: [{ index: 0, categoryId: "eyes" }] };
+    const game = { ...createGame(examplePuzzle), solvedRows: [{ index: 0, categoryId: "red" }] };
+    const columnLocked = { ...createGame(examplePuzzle), solvedColumns: [{ index: 0, categoryId: "eyes" }] };
 
     expect(isPositionLocked(game, 1)).toBe(true);
     expect(swapTiles(game, 1, 3)).toBe(game);
@@ -40,7 +42,7 @@ describe("Double Cross Connect rules", () => {
   });
 
   it("counts a guess as wrong only when it solves no new lines", () => {
-    expect(submitGuess(createGame()).wrongGuesses).toBe(1);
+    expect(submitGuess(createGame(examplePuzzle)).wrongGuesses).toBe(1);
 
     const solvedRow = boardState([
       "hair",
@@ -108,7 +110,7 @@ describe("Double Cross Connect rules", () => {
   });
 
   it("uses the selected puzzle's category and tile data", () => {
-    const puzzle = PUZZLES[1];
+    const puzzle = getPuzzleById("double-cross-002");
     const game = {
       ...createGame(puzzle),
       tiles: [
@@ -266,7 +268,7 @@ describe("Double Cross Connect rules", () => {
   });
 
   it("ends the game after three incorrect guesses and rejects further guesses", () => {
-    let game = createGame();
+    let game = createGame(examplePuzzle);
     for (let guess = 0; guess < MAX_WRONG_GUESSES; guess += 1) {
       game = submitGuess(game);
     }
@@ -299,7 +301,7 @@ describe("Double Cross Connect rules", () => {
   });
 
   it("can finish the example puzzle after locking early solved lines", () => {
-    let game = createGame();
+    let game = createGame(examplePuzzle);
     game = swapTiles(game, 0, 2);
     game = swapTiles(game, 1, 3);
     game = submitGuess(game);

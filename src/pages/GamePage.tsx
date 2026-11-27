@@ -26,6 +26,9 @@ interface SwapAnimation {
   y: number;
 }
 
+const INITIAL_FEEDBACK =
+  "Look for words you think have a connection.  Arrange them in a row or column and press Connect.";
+
 export default function GamePage() {
   const player = usePlayerProfile();
   const orderedPuzzles = [...PUZZLES].sort((a, b) => a.number - b.number);
@@ -34,7 +37,7 @@ export default function GamePage() {
   const [selected, setSelected] = useState<number | null>(null);
   const [highlighted, setHighlighted] = useState<Category | null>(null);
   const [isPractice, setIsPractice] = useState(() => hasPlayedPuzzle(player.data, puzzle.id));
-  const [feedback, setFeedback] = useState("Find the hidden connections. Every row and column has one.");
+  const [feedback, setFeedback] = useState(INITIAL_FEEDBACK);
   const [swapAnimation, setSwapAnimation] = useState<SwapAnimation | null>(null);
   const tileRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const tracker = useRef(trackGame(puzzle.id, puzzle.number, isPractice));
@@ -62,7 +65,7 @@ export default function GamePage() {
     setHighlighted(null);
     setSwapAnimation(null);
     setIsPractice(practice);
-    setFeedback("Find the hidden connections. Every row and column has one.");
+    setFeedback(INITIAL_FEEDBACK);
   };
 
   const startPracticeGame = () => startPuzzle(puzzle, true);

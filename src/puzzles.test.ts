@@ -4,10 +4,10 @@ import { createGame, submitGuess, swapTiles } from "./game";
 import { PUZZLES } from "./puzzles";
 
 describe("puzzle collection", () => {
-  it("uses unique tracking ids and consecutive puzzle numbers starting at one", () => {
+  it("uses unique tracking ids and consecutive puzzle numbers starting at zero", () => {
     expect(new Set(PUZZLES.map((puzzle) => puzzle.id)).size).toBe(PUZZLES.length);
     expect(PUZZLES.map((puzzle) => puzzle.number)).toEqual(
-      Array.from({ length: PUZZLES.length }, (_, index) => index + 1)
+      Array.from({ length: PUZZLES.length }, (_, index) => index)
     );
   });
 

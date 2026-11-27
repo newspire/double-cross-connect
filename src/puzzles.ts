@@ -23,6 +23,31 @@ export interface PuzzleDefinition {
 
 export const PUZZLES: PuzzleDefinition[] = [
   {
+    id: "double-cross-000",
+    number: 0,
+    author: "@newspire",
+    categories: [
+      { id: "red", label: "Red", members: ["apple", "cardinal", "rose"] },
+      { id: "yellow", label: "Yellow", members: ["banana", "canary", "sunflower"] },
+      { id: "green", label: "Green", members: ["lime", "frog", "clover"] },
+      { id: "fruit", label: "Fruit", members: ["apple", "banana", "lime"] },
+      { id: "animals", label: "Animals", members: ["cardinal", "canary", "frog"] },
+      { id: "plants", label: "Plants", members: ["rose", "sunflower", "clover"] }
+    ],
+    tiles: {
+      apple: { id: "apple", label: "apple" },
+      cardinal: { id: "cardinal", label: "cardinal" },
+      rose: { id: "rose", label: "rose" },
+      banana: { id: "banana", label: "banana" },
+      canary: { id: "canary", label: "canary" },
+      sunflower: { id: "sunflower", label: "sunflower" },
+      lime: { id: "lime", label: "lime" },
+      frog: { id: "frog", label: "frog" },
+      clover: { id: "clover", label: "clover" }
+    },
+    initialTiles: ["rose", "banana", "cardinal", "lime", "sunflower", "canary", "apple", "frog", "clover"]
+  },
+  {
     id: "double-cross-001",
     number: 1,
     author: "@newspire",
