@@ -6,6 +6,8 @@ Puzzles have stable IDs, sequence numbers, and author credits. The game starts w
 
 On supported browsers, an **Install app** button appears when the browser offers installation. On iPhone or iPad, use Safari's Share menu and choose **Add to Home Screen**.
 
+New players see a looping example of puzzle #0 on their first visit. Dismiss it with **Play** or the close button, or revisit it from the About page. The example runs separately from the player's game, statistics and analytics. Browsers requesting reduced motion see a static explanation instead.
+
 ## Run locally
 
 ```sh

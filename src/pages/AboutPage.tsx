@@ -1,9 +1,24 @@
 // Copyright (c) 2026 Andy Yates. All rights reserved.
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import DemoDialog from "../DemoDialog";
+import { markDemoSeen } from "../demo";
 
 export default function AboutPage() {
+  const [showDemo, setShowDemo] = useState(false);
+  const navigate = useNavigate();
+  const closeDemo = () => {
+    try {
+      markDemoSeen(window.localStorage);
+    } catch (error) {
+      console.error("Could not save the demo preference.", error);
+    }
+    setShowDemo(false);
+  };
+
   return (
     <section className="about-page" aria-labelledby="about-title">
+      {showDemo && <DemoDialog onClose={closeDemo} onPlay={() => { closeDemo(); navigate("/"); }} />}
       <div className="about-copy">
         <p className="eyebrow">A GAME ABOUT THE SPACE BETWEEN</p>
         <h1 id="about-title">Two ways to see <span>everything.</span></h1>
@@ -19,6 +34,9 @@ export default function AboutPage() {
           <li><span>04</span><p>Find all six connections. Your third guess with no connection ends the game.</p></li>
           <li><span>05</span><p>Track results on the Stats page. Replay a finished puzzle as practice without changing your stats.</p></li>
         </ol>
+        <button type="button" className="restart-button about-demo-button" onClick={() => setShowDemo(true)}>
+          Watch the demo
+        </button>
         <Link className="connect-button about-play-button" to="/">
           Let's play <span aria-hidden="true">↗</span>
         </Link>
@@ -37,7 +55,7 @@ export default function AboutPage() {
             <div><dt>Contact</dt><dd><a href="mailto:newspire@gmail.com">newspire@gmail.com</a></dd></div>
           </dl>
           <p>&copy; 2026 Andy Yates. All rights reserved.</p>
-          <p>Version 0.1.0</p>
+          <p>Version 0.2.0</p>
         </div>
       </div>
     </section>

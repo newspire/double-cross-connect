@@ -18,6 +18,8 @@ import {
 } from "../player";
 import { usePlayerProfile } from "../usePlayerProfile";
 import { trackGame } from "../analytics";
+import DemoDialog from "../DemoDialog";
+import { markDemoSeen, shouldShowDemo } from "../demo";
 
 interface SwapAnimation {
   first: number;
@@ -31,6 +33,15 @@ const INITIAL_FEEDBACK =
 
 export default function GamePage() {
   const player = usePlayerProfile();
+  const [showDemo, setShowDemo] = useState(() => {
+    if (!player.canPersist) return false;
+    try {
+      return shouldShowDemo(player.data, window.localStorage);
+    } catch (error) {
+      console.error("Could not check the demo preference.", error);
+      return false;
+    }
+  });
   const orderedPuzzles = [...PUZZLES].sort((a, b) => a.number - b.number);
   const [puzzle, setPuzzle] = useState(() => getOldestUnplayedPuzzle(orderedPuzzles, player.data));
   const [game, setGame] = useState<GameState>(() => createGame(puzzle));
@@ -41,6 +52,15 @@ export default function GamePage() {
   const [swapAnimation, setSwapAnimation] = useState<SwapAnimation | null>(null);
   const tileRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const tracker = useRef(trackGame(puzzle.id, puzzle.number, isPractice));
+
+  const closeDemo = () => {
+    try {
+      markDemoSeen(window.localStorage);
+    } catch (error) {
+      console.error("Could not save the demo preference.", error);
+    }
+    setShowDemo(false);
+  };
 
   useLayoutEffect(() => {
     if (!swapAnimation || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -153,6 +173,7 @@ export default function GamePage() {
 
   return (
     <section className="game-page" aria-labelledby="game-title">
+      {showDemo && <DemoDialog onClose={closeDemo} onPlay={closeDemo} />}
       <div className="game-intro">
         <p className="eyebrow">TODAY'S LITTLE BRAIN TEASER</p>
         <h1 id="game-title">Double Cross <span>Connect</span></h1>

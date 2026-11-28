@@ -657,6 +657,144 @@ main {
   text-decoration: none;
 }
 
+.about-demo-button {
+  margin-right: 10px;
+}
+
+.demo-dialog {
+  position: fixed;
+  width: min(460px, calc(100% - 28px));
+  max-height: calc(100% - 28px);
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 18px 60px rgba(23, 57, 74, 0.22);
+}
+
+.demo-dialog::backdrop {
+  background: rgba(15, 35, 44, 0.65);
+}
+
+.demo-dialog h2 {
+  margin: 8px 0;
+  font-family: Fraunces, Georgia, serif;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.demo-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 27px;
+}
+
+.demo-intro,
+.demo-note {
+  color: #64747a;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.demo-grid {
+  position: relative;
+  width: min(100%, 240px, 34vh);
+  aspect-ratio: 1;
+  margin: 18px auto 0;
+}
+
+.demo-tile {
+  position: absolute;
+  width: calc((100% - 12px) / 3);
+  height: calc((100% - 12px) / 3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border: 1px solid #e8e2d7;
+  border-radius: 10px;
+  background: #fbf8f2;
+  text-align: center;
+  font-family: Fraunces, Georgia, serif;
+  font-size: clamp(9px, 2.8vw, 11px);
+  overflow-wrap: anywhere;
+  transition: left 600ms ease, top 600ms ease, background 200ms ease, border-color 200ms ease;
+}
+
+.demo-tile.selected {
+  border-color: var(--coral);
+  background: #fff0e8;
+  box-shadow: 0 0 0 2px rgba(237, 106, 72, 0.16);
+}
+
+.demo-tile.locked {
+  border-color: #d9e8dd;
+  background: #eff6f0;
+  color: #416857;
+}
+
+.demo-feedback {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #64747a;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.demo-connect {
+  flex-shrink: 0;
+  padding: 9px;
+  border-radius: 7px;
+  background: var(--ink);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.demo-connect.active {
+  background: var(--coral);
+  box-shadow: 0 0 0 3px rgba(237, 106, 72, 0.25);
+}
+
+.demo-connections {
+  display: grid;
+  gap: 5px;
+  min-height: 50px;
+  color: #64747a;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.demo-connections strong {
+  color: var(--ink);
+}
+
+.demo-note {
+  margin: 10px 0;
+}
+
+.demo-play {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-tile {
+    transition: none;
+  }
+}
+
 .about-privacy {
   margin-top: 36px;
 }
