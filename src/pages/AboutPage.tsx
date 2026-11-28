@@ -28,7 +28,7 @@ export default function AboutPage() {
         <div className="about-rule" />
         <h2>How to play</h2>
         <div className="about-demo">
-          <p>See the game in action with a separate example puzzle.</p>
+          <p>See the game in action.</p>
           <button type="button" className="about-demo-button" onClick={() => setShowDemo(true)}>
             Watch the demo <span aria-hidden="true">▶</span>
           </button>
