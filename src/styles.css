@@ -730,8 +730,7 @@ main {
   font-size: 27px;
 }
 
-.demo-intro,
-.demo-note {
+.demo-intro {
   color: #64747a;
   font-size: 12px;
   line-height: 1.55;
@@ -811,10 +810,6 @@ main {
 
 .demo-connections strong {
   color: var(--ink);
-}
-
-.demo-note {
-  margin: 10px 0;
 }
 
 .demo-play {

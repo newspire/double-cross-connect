@@ -84,7 +84,6 @@ export default function DemoDialog({ onClose, onPlay }: DemoDialogProps) {
           <span>{DEMO_PUZZLE.categories.filter((category) => solvedIds.has(category.id)).map((category) => category.label).join(" · ")}</span>
         )}
       </div>
-      <p className="demo-note">This example doesn't affect your stats.</p>
       <button type="button" className="connect-button demo-play" onClick={onPlay}>
         Play <span aria-hidden="true">↗</span>
       </button>
