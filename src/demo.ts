@@ -1,16 +1,34 @@
 // Copyright (c) 2026 Andy Yates. All rights reserved.
 import { createGame, submitGuess, swapTiles, type GameState } from "./game";
-import { getPuzzleById } from "./puzzles";
+import type { PuzzleDefinition } from "./puzzles";
 import type { PlayerData } from "./player";
 
 export const DEMO_SEEN_KEY = "double-cross-connect.demo-seen.v1";
 
-export const DEMO_PUZZLE = {
-  ...getPuzzleById("double-cross-000"),
+export const DEMO_PUZZLE: PuzzleDefinition = {
+  id: "demo-example",
+  number: 0,
+  author: "",
+  categories: [
+    { id: "red", label: "Red shapes", members: ["red-circle", "red-square", "red-triangle"] },
+    { id: "blue", label: "Blue shapes", members: ["blue-circle", "blue-square", "blue-triangle"] },
+    { id: "green", label: "Green shapes", members: ["green-circle", "green-square", "green-triangle"] },
+    { id: "circles", label: "Circles", members: ["red-circle", "blue-circle", "green-circle"] },
+    { id: "squares", label: "Squares", members: ["red-square", "blue-square", "green-square"] },
+    { id: "triangles", label: "Triangles", members: ["red-triangle", "blue-triangle", "green-triangle"] }
+  ],
+  tiles: Object.fromEntries(
+    ["red", "blue", "green"].flatMap((color) =>
+      ["circle", "square", "triangle"].map((shape) => {
+        const id = `${color}-${shape}`;
+        return [id, { id, label: `${color} ${shape}` }];
+      })
+    )
+  ),
   initialTiles: [
-    "banana", "cardinal", "rose",
-    "apple", "canary", "lime",
-    "sunflower", "clover", "frog"
+    "blue-circle", "red-square", "red-triangle",
+    "red-circle", "blue-square", "green-circle",
+    "blue-triangle", "green-triangle", "green-square"
   ]
 };
 

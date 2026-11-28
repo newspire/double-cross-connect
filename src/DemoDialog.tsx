@@ -51,7 +51,7 @@ export default function DemoDialog({ onClose, onPlay }: DemoDialogProps) {
       onCancel={(event) => { event.preventDefault(); onClose(); }}
     >
       <button className="demo-close" type="button" onClick={onClose} aria-label="Close demo">×</button>
-      <p className="eyebrow">A QUICK EXAMPLE · PUZZLE #0</p>
+      <p className="eyebrow">A QUICK EXAMPLE · DEMO PUZZLE</p>
       <h2 id="demo-title">See how it works.</h2>
       <p id="demo-description" className="demo-intro">
         Swap tiles, then press Connect. Each tile belongs to a row and a column.

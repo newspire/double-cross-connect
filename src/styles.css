@@ -657,8 +657,40 @@ main {
   text-decoration: none;
 }
 
+.about-demo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid #e9c2b5;
+  border-radius: 10px;
+  background: #fff3ec;
+}
+
+.about-demo p {
+  flex: 1 1 170px;
+  margin: 0;
+  color: #64747a;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .about-demo-button {
-  margin-right: 10px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--coral);
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.about-demo-button:hover {
+  background: #c94f30;
 }
 
 .demo-dialog {

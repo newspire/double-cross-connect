@@ -25,8 +25,8 @@ describe("first-visit demo", () => {
 
   it("shows two legal swaps and two genuine submissions, with connections locking", () => {
     const [initial, firstSwap, , firstConnect, , secondSwap, , secondConnect] = DEMO_FRAMES;
-    expect(DEMO_PUZZLE.number).toBe(0);
-    expect(DEMO_PUZZLE.initialTiles).not.toEqual(PUZZLES[0].initialTiles);
+    expect(PUZZLES.some((puzzle) => puzzle.id === DEMO_PUZZLE.id)).toBe(false);
+    expect(PUZZLES.every((puzzle) => puzzle.categories !== DEMO_PUZZLE.categories)).toBe(true);
     expect(initial.game.hasStarted).toBe(false);
     expect(firstSwap.game.hasStarted).toBe(true);
     expect(firstConnect.game.guesses).toBe(1);
